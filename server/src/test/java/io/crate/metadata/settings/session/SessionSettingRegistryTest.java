@@ -40,6 +40,7 @@ import static io.crate.testing.TestingHelpers.createNodeContext;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SessionSettingRegistryTest {
@@ -58,6 +59,17 @@ public class SessionSettingRegistryTest {
         assertThrows(UnsupportedOperationException.class,
                      () -> setting.apply(sessionContext, generateInput("32"), eval),
                      "\"max_index_keys\" cannot be changed.");
+    }
+
+    @Test
+    public void testDateStyleCannotBeChanged() {
+        SessionSetting<?> setting = new SessionSettingRegistry(Set.of(new LoadedRules())).settings().get(SessionSettingRegistry.DATE_STYLE_KEY);
+
+        assertDoesNotThrow(() -> setting.apply(sessionContext, generateInput("ISO"), eval));
+
+        assertThrows(UnsupportedOperationException.class,
+                     () -> setting.apply(sessionContext, generateInput("SQL"), eval),
+                     "\"datestyle\" cannot be changed.");
     }
 
     @Test

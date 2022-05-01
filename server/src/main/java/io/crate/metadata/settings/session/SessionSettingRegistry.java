@@ -26,6 +26,7 @@ import static io.crate.metadata.SearchPath.createSearchPathFrom;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.Locale;
 
 
 import io.crate.common.collections.MapBuilder;
@@ -46,6 +47,7 @@ public class SessionSettingRegistry {
     private static final String SERVER_VERSION_NUM = "server_version_num";
     private static final String SERVER_VERSION = "server_version";
     static final String ERROR_ON_UNKNOWN_OBJECT_KEY = "error_on_unknown_object_key";
+    static final String DATE_STYLE_KEY = "datestyle";
     private final Map<String, SessionSetting<?>> settings;
 
     @Inject
@@ -128,7 +130,28 @@ public class SessionSettingRegistry {
                      s -> Boolean.toString(s.errorOnUnknownObjectKey()),
                      () -> String.valueOf(true),
                      "Raises or suppresses ObjectKeyUnknownException when querying nonexistent keys to dynamic objects.",
-                     DataTypes.BOOLEAN));
+                     DataTypes.BOOLEAN))
+            .put(DATE_STYLE_KEY,
+                 new SessionSetting<>(
+                     DATE_STYLE_KEY,
+                     objects -> {
+                         if (objects.length != 1) {
+                             throw new IllegalArgumentException(DATE_STYLE_KEY + " should have only one argument.");
+                         }
+                     },
+                     objects -> DataTypes.STRING.implicitCast(objects[0]),
+                     (s, v) -> {
+                         if (!v.toUpperCase(Locale.ENGLISH).equals(String.valueOf(PostgresWireProtocol.DATE_STYLE))) {
+                             throw new UnsupportedOperationException("\"" + DATE_STYLE_KEY + "\" cannot be changed.");
+                         }
+                     },
+                     s -> String.valueOf(PostgresWireProtocol.DATE_STYLE),
+                     () -> String.valueOf(PostgresWireProtocol.DATE_STYLE),
+                     "Display format for date and time values.",
+                     DataTypes.STRING
+                )
+            );
+            
 
         for (var providers : sessionSettingProviders) {
             for (var setting : providers.sessionSettings()) {

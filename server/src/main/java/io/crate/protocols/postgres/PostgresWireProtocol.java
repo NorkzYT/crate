@@ -191,6 +191,7 @@ public class PostgresWireProtocol {
 
     public static int SERVER_VERSION_NUM = 100500;
     public static String PG_SERVER_VERSION = "10.5";
+    public static String DATE_STYLE = "ISO";
 
     final PgDecoder decoder;
     final MessageHandler handler;
@@ -472,7 +473,7 @@ public class PostgresWireProtocol {
         Messages.sendParameterStatus(channel, "server_version", PG_SERVER_VERSION);
         Messages.sendParameterStatus(channel, "server_encoding", "UTF8");
         Messages.sendParameterStatus(channel, "client_encoding", "UTF8");
-        Messages.sendParameterStatus(channel, "datestyle", "ISO");
+        Messages.sendParameterStatus(channel, "datestyle", DATE_STYLE);
         Messages.sendParameterStatus(channel, "TimeZone", "UTC");
         Messages.sendParameterStatus(channel, "integer_datetimes", "on");
     }

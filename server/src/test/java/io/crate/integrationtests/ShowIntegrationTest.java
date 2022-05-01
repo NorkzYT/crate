@@ -398,6 +398,7 @@ public class ShowIntegrationTest extends SQLIntegrationTestCase {
     public void testShowAll() {
         execute("show all");
         assertThat(printedTable(response.rows()), is(
+            "datestyle| ISO| Display format for date and time values.\n" +
             "enable_hashjoin| true| Considers using the Hash Join instead of the Nested Loop Join implementation.\n" +
             "error_on_unknown_object_key| true| Raises or suppresses ObjectKeyUnknownException when querying nonexistent keys to dynamic objects.\n" +
             "max_index_keys| 32| Shows the maximum number of index keys.\n" +

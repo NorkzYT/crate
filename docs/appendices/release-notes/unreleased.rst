@@ -66,6 +66,7 @@ Changes
 
 - Users with AL privileges can now run ``ANALYZE``
 
+- Added ``datestyle`` session setting. Setting ``datestyle`` to a value other than the default value leads to an exception.
 
 Fixes
 =====

@@ -17,6 +17,7 @@ charset
 cleartext
 concat
 conninfo
+datestyle
 deallocate
 Deallocate
 deallocating

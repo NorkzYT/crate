@@ -180,7 +180,7 @@ public final class GenerateSeries<T extends Number> extends TableFunctionImpleme
         this.plus = plus;
         this.divide = divide;
         this.comparator = comparator;
-        this.returnType = new RowType(List.of(boundSignature.getArgumentDataTypes().get(0)));
+        this.returnType = new RowType(List.of(boundSignature.getArgumentDataTypes().get(0)), List.of(NAME.name()));
     }
 
     @Override

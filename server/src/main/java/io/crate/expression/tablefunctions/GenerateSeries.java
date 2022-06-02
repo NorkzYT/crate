@@ -237,7 +237,7 @@ public final class GenerateSeries<T extends Number> extends TableFunctionImpleme
         public GenerateSeriesIntervals(Signature signature, Signature boundSignature) {
             this.signature = signature;
             this.boundSignature = boundSignature;
-            returnType = new RowType(List.of(boundSignature.getArgumentDataTypes().get(0)));
+            returnType = new RowType(List.of(boundSignature.getArgumentDataTypes().get(0)), List.of(NAME.name()));
         }
 
         @Override

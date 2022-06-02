@@ -122,14 +122,14 @@ The return value always matches the ``start`` / ``stop`` types.
 ::
 
     cr> SELECT * FROM generate_series(1, 4);
-    +------+
-    | col1 |
-    +------+
-    |    1 |
-    |    2 |
-    |    3 |
-    |    4 |
-    +------+
+    +-----------------+
+    | generate_series |
+    +-----------------+
+    |               1 |
+    |               2 |
+    |               3 |
+    |               4 |
+    +-----------------+
     SELECT 4 rows in set (... sec)
 
 ::

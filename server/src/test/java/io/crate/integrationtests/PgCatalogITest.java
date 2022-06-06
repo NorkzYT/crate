@@ -21,6 +21,8 @@
 
 package io.crate.integrationtests;
 
+import io.crate.metadata.RelationName;
+import io.crate.metadata.pgcatalog.OidHash;
 import io.crate.testing.UseHashJoins;
 import io.crate.testing.UseRandomizedSchema;
 
@@ -268,5 +270,30 @@ public class PgCatalogITest extends SQLIntegrationTestCase {
         assertThat(printedTable(response.rows()), is(
             ""
         ));
+    }
+
+    @Test
+    public void test_pg_constrains_conkey_array_populated() throws Exception {
+        execute("CREATE TABLE doc.tbl (" +
+            "not_null1 int not null," +
+            "int_col int," +
+            "long_col bigint," +
+            "str_col text," +
+            "not_null2 bigint not null," +
+            "checked int CHECK(checked>0)," +
+            "checked_and_not_null int not null check (checked_and_not_null > 10)," +
+            "PRIMARY KEY (int_col, long_col, str_col))"
+        );
+        int reloid = OidHash.relationOid(OidHash.Type.TABLE, new RelationName("doc", "tbl"));
+        response = execute("select i.conkey, i.conname, i.contype from pg_catalog.pg_constraint i where i.conrelid  = " + reloid);
+        assertThat(printedTable(response.rows()), is(
+            "[2, 3, 4]| tbl_pk| p" +
+                "\n[]| doc_tbl_not_null1_not_null| c" +
+                "\n[]| doc_tbl_not_null2_not_null| c" +
+                "\n[]| doc_tbl_checked_and_not_null_not_null| c" +
+                "\n[]| doc_tbl_checked_check_fbbeb2950ae8| c" +
+                "\n[]| doc_tbl_checked_and_not_null_check_13fc671ecf14| c\n"
+        ));
+
     }
 }

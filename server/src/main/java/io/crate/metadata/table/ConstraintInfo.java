@@ -24,6 +24,9 @@ package io.crate.metadata.table;
 import io.crate.metadata.RelationInfo;
 import io.crate.metadata.RelationName;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This class is used as information store of table constraints when
  * being displayed.
@@ -60,6 +63,7 @@ public class ConstraintInfo {
     }
 
     private final String constraintName;
+    private final List<Short> conkey;
     private final RelationInfo relationInfo;
     private final Type constraintType;
 
@@ -67,6 +71,40 @@ public class ConstraintInfo {
         this.relationInfo = relationInfo;
         this.constraintName = constraintName;
         this.constraintType = constraintType;
+        this.conkey = getConstraintColumnIndices(relationInfo, constraintType);
+
+    }
+
+    private static List<Short> getConstraintColumnIndices(RelationInfo relationInfo, Type constraintType) {
+        List<Short> result = new ArrayList<>();
+        if (constraintType == Type.PRIMARY_KEY) {
+            var pkeys = relationInfo.primaryKey();
+            for (int i = 0; i < pkeys.size(); i++) {
+                var iterator = relationInfo.columns().iterator();
+                while (iterator.hasNext()) {
+                    var ref = iterator.next();
+                    if (ref.column().equals(pkeys.get(i))) {
+                        result.add((short) ref.position());
+                        break;
+                    }
+                }
+            }
+        } else if (constraintType == Type.CHECK) {
+            var checks = relationInfo.checkConstraints();
+            for (int i = 0; i < relationInfo.checkConstraints().size(); i++) {
+                var iterator = relationInfo.columns().iterator();
+                while (iterator.hasNext()) {
+                    var ref = iterator.next();
+                    if (ref.column().name().equals(checks.get(i).columnName())) {
+                        result.add((short) ref.position());
+                        break;
+                    }
+                }
+            }
+        } else {
+            result = null;
+        }
+        return result;
     }
 
     public RelationName relationName() {
@@ -83,5 +121,9 @@ public class ConstraintInfo {
 
     public Type constraintType() {
         return constraintType;
+    }
+
+    public List<Short> conkey() {
+        return conkey;
     }
 }

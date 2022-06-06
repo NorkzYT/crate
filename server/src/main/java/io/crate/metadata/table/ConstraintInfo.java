@@ -89,19 +89,10 @@ public class ConstraintInfo {
                     }
                 }
             }
-        } else if (constraintType == Type.CHECK) {
-            var checks = relationInfo.checkConstraints();
-            for (int i = 0; i < relationInfo.checkConstraints().size(); i++) {
-                var iterator = relationInfo.columns().iterator();
-                while (iterator.hasNext()) {
-                    var ref = iterator.next();
-                    if (ref.column().name().equals(checks.get(i).columnName())) {
-                        result.add((short) ref.position());
-                        break;
-                    }
-                }
-            }
         } else {
+            // conkey array is currently populated only for PK.
+            // To make the same for CHECK we need to introduce breaking change and enrich "check_constraints" meta map with column name to resolve position
+            // (or better just enrich by position to avoid looping)
             result = null;
         }
         return result;

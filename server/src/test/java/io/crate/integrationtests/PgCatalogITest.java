@@ -286,6 +286,7 @@ public class PgCatalogITest extends SQLIntegrationTestCase {
         );
         int reloid = OidHash.relationOid(OidHash.Type.TABLE, new RelationName("doc", "tbl"));
         response = execute("select i.conkey, i.conname, i.contype from pg_catalog.pg_constraint i where i.conrelid  = " + reloid);
+      // currently only for PK
         assertThat(printedTable(response.rows()), is(
             "[2, 3, 4]| tbl_pk| p" +
                 "\n[]| doc_tbl_not_null1_not_null| c" +

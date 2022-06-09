@@ -33,6 +33,7 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+import io.crate.analyze.AnalyzedDeclareCursor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.cluster.ClusterState;
@@ -259,7 +260,7 @@ public class Session implements AutoCloseable {
         return sessionContext;
     }
 
-    public void parse(String statementName, String query, List<DataType> paramTypes) {
+    public void parse(String statementName, String[] portalNameCapture, String query, List<DataType> paramTypes) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("method=parse stmtName={} query={} paramTypes={}", statementName, query, paramTypes);
         }
@@ -275,10 +276,11 @@ public class Session implements AutoCloseable {
                 throw t;
             }
         }
-        analyze(statementName, statement, paramTypes, query);
+        analyze(statementName, portalNameCapture, statement, paramTypes, query);
     }
 
     public void analyze(String statementName,
+                        String[] portalNameCapture,
                         Statement statement,
                         List<DataType> paramTypes,
                         @Nullable String query) {
@@ -301,9 +303,11 @@ public class Session implements AutoCloseable {
                 sessionContext.sessionUser());
             throw t;
         }
-        preparedStatements.put(
-            statementName,
-            new PreparedStmt(statement, analyzedStatement, query, parameterTypes));
+
+        preparedStatements.put(statementName, new PreparedStmt(statement, analyzedStatement, query, parameterTypes));
+        if (analyzedStatement instanceof AnalyzedDeclareCursor declareCursor) {
+            portalNameCapture[0] = declareCursor.getCursorName();
+        }
     }
 
     public void bind(String portalName,

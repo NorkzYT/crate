@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.  You may
  * obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -19,33 +19,25 @@
  * software solely pursuant to the terms of the relevant commercial agreement.
  */
 
-package io.crate.expression.tablefunctions;
+package io.crate.analyze;
 
-import io.crate.data.Row;
-import io.crate.data.RowN;
-import org.junit.Test;
+import io.crate.analyze.relations.RelationAnalyzer;
+import io.crate.metadata.CoordinatorTxnCtx;
+import io.crate.sql.tree.DeclareCursor;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+public class DeclareCursorAnalyzer {
 
-import static org.hamcrest.Matchers.is;
+    private final RelationAnalyzer relationAnalyzer;
 
-public class PgGetKeywordsFunctionTest extends AbstractTableFunctionsTest {
+    public DeclareCursorAnalyzer(RelationAnalyzer relationAnalyzer) {
+        this.relationAnalyzer = relationAnalyzer;
+    }
 
-    @Test
-    public void test_pg_get_keywords() {
-        var it = execute("pg_catalog.pg_get_keywords()").iterator();
-        List<Row> rows = new ArrayList<>();
-        while (it.hasNext()) {
-            rows.add(new RowN(it.next().materialize()));
-        }
-        rows.sort(Comparator.comparing(x -> ((String) x.get(0))));
-        assertThat(rows.size(), is(256));
-        Row row = rows.get(0);
-
-        assertThat(row.get(0), is("add"));
-        assertThat(row.get(1), is("R"));
-        assertThat(row.get(2), is("reserved"));
+    public AnalyzedDeclareCursor analyze(DeclareCursor declareCursor,
+                                         ParamTypeHints paramTypeHints,
+                                         CoordinatorTxnCtx txnCtx) {
+        return new AnalyzedDeclareCursor(
+            declareCursor.getCursorName(),
+            relationAnalyzer.analyze(declareCursor.getQuery(), txnCtx, paramTypeHints));
     }
 }

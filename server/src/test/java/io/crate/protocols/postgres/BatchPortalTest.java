@@ -105,7 +105,7 @@ public class BatchPortalTest extends CrateDummyClusterServiceUnitTest {
             executor,
             SessionContext.systemSessionContext());
 
-        session.parse("S_1", "insert into t1(x) values(1)", Collections.emptyList());
+        session.parse("S_1", new String[]{"Portal"}, "insert into t1(x) values(1)", Collections.emptyList());
         session.bind("Portal", "S_1", Collections.emptyList(), null);
         final ArrayList<Object[]> s1Rows = new ArrayList<>();
         session.execute("Portal", 0, new BaseResultReceiver() {
@@ -115,7 +115,7 @@ public class BatchPortalTest extends CrateDummyClusterServiceUnitTest {
             }
         });
 
-        session.parse("S_2", "insert into t1(x) values(?)", Collections.emptyList());
+        session.parse("S_2", new String[]{"Portal"}, "insert into t1(x) values(?)", Collections.emptyList());
         session.bind("Portal", "S_2", Collections.singletonList(2), null);
         final ArrayList<Object[]> s2Rows = new ArrayList<>();
         session.execute("Portal", 0, new BaseResultReceiver() {

@@ -522,7 +522,7 @@ public class PostgresWireProtocol {
             }
             paramTypes.add(dataType);
         }
-        session.parse(statementName, query, paramTypes);
+        session.parse(statementName, new String[]{""}, query, paramTypes);
         Messages.sendParseComplete(channel);
     }
 
@@ -766,16 +766,17 @@ public class PostgresWireProtocol {
             query = statement.toString();
         }
         AccessControl accessControl = getAccessControl.apply(session.sessionContext());
+        String[] portalNameCapture = new String[]{""};
         try {
-            session.analyze("", statement, Collections.emptyList(), query);
-            session.bind("", "", Collections.emptyList(), null);
-            DescribeResult describeResult = session.describe('P', "");
+            session.analyze("", portalNameCapture, statement, Collections.emptyList(), query);
+            session.bind(portalNameCapture[0], "", Collections.emptyList(), null);
+            DescribeResult describeResult = session.describe('P', portalNameCapture[0]);
             List<Symbol> fields = describeResult.getFields();
 
             CompletableFuture<?> execute;
             if (fields == null) {
                 RowCountReceiver rowCountReceiver = new RowCountReceiver(query, channel.bypassDelay(), accessControl);
-                execute = session.execute("", 0, rowCountReceiver);
+                execute = session.execute(portalNameCapture[0], 0, rowCountReceiver);
             } else {
                 Messages.sendRowDescription(channel, fields, null, describeResult.relation());
                 ResultSetReceiver resultSetReceiver = new ResultSetReceiver(
@@ -786,7 +787,7 @@ public class PostgresWireProtocol {
                     Lists2.map(fields, x -> PGTypes.get(x.valueType())),
                     null
                 );
-                execute = session.execute("", 0, resultSetReceiver);
+                execute = session.execute(portalNameCapture[0], 0, resultSetReceiver);
             }
             if (execute != null) {
                 channel.delayWritesUntil(execute);

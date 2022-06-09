@@ -105,6 +105,7 @@ import io.crate.sql.tree.CreateUser;
 import io.crate.sql.tree.CreateView;
 import io.crate.sql.tree.CurrentTime;
 import io.crate.sql.tree.DeallocateStatement;
+import io.crate.sql.tree.DeclareCursor;
 import io.crate.sql.tree.DecommissionNodeStatement;
 import io.crate.sql.tree.Delete;
 import io.crate.sql.tree.DenyPrivilege;
@@ -2019,6 +2020,11 @@ class AstBuilder extends SqlBaseBaseVisitor<Node> {
                 .map(c -> c.getText().toLowerCase(Locale.ENGLISH))
                 .collect(Collectors.joining(" "))
         );
+    }
+
+    @Override
+    public Node visitDeclareCursor(SqlBaseParser.DeclareCursorContext ctx) {
+        return new DeclareCursor(getIdentText(ctx.ident()), (Query) visit(ctx.query()));
     }
 
     private static String getObjectType(Token type) {

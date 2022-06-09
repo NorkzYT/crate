@@ -89,6 +89,7 @@ statement
     | DEALLOCATE (PREPARE)? (ALL | prepStmt=stringLiteralOrIdentifierOrQname)        #deallocate
     | ANALYZE                                                                        #analyze
     | DISCARD (ALL | PLANS | SEQUENCES | TEMPORARY | TEMP)                           #discard
+    | DECLARE ident CURSOR ((WITH | WITHOUT) HOLD)? FOR query                        #declareCursor
     ;
 
 dropStmt
@@ -736,7 +737,7 @@ nonReserved
     | REPLACE | RETURNING | SWAP | GC | DANGLING | ARTIFACTS | DECOMMISSION | LEADING | TRAILING | BOTH | TRIM
     | CURRENT_SCHEMA | PROMOTE | CHARACTER | VARYING
     | DISCARD | PLANS | SEQUENCES | TEMPORARY | TEMP | METADATA
-    | PUBLICATION | SUBSCRIPTION | ENABLE | DISABLE | CONNECTION
+    | PUBLICATION | SUBSCRIPTION | ENABLE | DISABLE | CONNECTION | DECLARE | CURSOR | HOLD
     ;
 
 AUTHORIZATION: 'AUTHORIZATION';
@@ -1012,6 +1013,10 @@ SUBSCRIPTION: 'SUBSCRIPTION';
 CONNECTION: 'CONNECTION';
 ENABLE: 'ENABLE';
 DISABLE: 'DISABLE';
+
+DECLARE: 'DECLARE';
+CURSOR: 'CURSOR';
+HOLD: 'HOLD';
 
 EQ  : '=';
 NEQ : '<>' | '!=';

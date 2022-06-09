@@ -59,6 +59,7 @@ import io.crate.sql.tree.CreateTableAs;
 import io.crate.sql.tree.CreateUser;
 import io.crate.sql.tree.CreateView;
 import io.crate.sql.tree.DeallocateStatement;
+import io.crate.sql.tree.DeclareCursor;
 import io.crate.sql.tree.DecommissionNodeStatement;
 import io.crate.sql.tree.Delete;
 import io.crate.sql.tree.DenyPrivilege;
@@ -145,6 +146,7 @@ public class Analyzer {
     private final SetStatementAnalyzer setStatementAnalyzer;
     private final ResetStatementAnalyzer resetStatementAnalyzer;
     private final LogicalReplicationAnalyzer logicalReplicationAnalyzer;
+    private final DeclareCursorAnalyzer declareCursorAnalyzer;
 
     /**
      * @param relationAnalyzer is injected because we also need to inject it in
@@ -204,6 +206,7 @@ public class Analyzer {
             logicalReplicationService,
             nodeCtx
         );
+        this.declareCursorAnalyzer = new DeclareCursorAnalyzer(relationAnalyzer);
     }
 
     public AnalyzedStatement analyze(Statement statement,
@@ -680,6 +683,12 @@ public class Analyzer {
         public AnalyzedStatement visitAlterSubscription(AlterSubscription alterSubscription,
                                                         Analysis context) {
             return logicalReplicationAnalyzer.analyze(alterSubscription, context.sessionContext());
+        }
+
+        @Override
+        public AnalyzedStatement visitDeclareCursor(DeclareCursor declareCursor,
+                                                    Analysis context) {
+            return declareCursorAnalyzer.analyze(declareCursor, context.paramTypeHints(), context.transactionContext());
         }
     }
 }

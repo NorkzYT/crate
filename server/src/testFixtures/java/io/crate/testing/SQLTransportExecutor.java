@@ -251,7 +251,7 @@ public class SQLTransportExecutor {
                                 ActionListener<SQLResponse> listener,
                                 Session session) {
         try {
-            session.parse(UNNAMED, stmt, Collections.emptyList());
+            session.parse(UNNAMED, new String[]{UNNAMED}, stmt, Collections.emptyList());
             List<Object> argsList = args == null ? Collections.emptyList() : Arrays.asList(args);
             session.bind(UNNAMED, UNNAMED, argsList, null);
             List<Symbol> outputFields = session.describe('P', UNNAMED).getFields();
@@ -275,7 +275,7 @@ public class SQLTransportExecutor {
         }
         Session session = newSession();
         try {
-            session.parse(UNNAMED, stmt, Collections.emptyList());
+            session.parse(UNNAMED, new String[]{UNNAMED}, stmt, Collections.emptyList());
             final long[] rowCounts = bulkArgs == null ? new long[0] : new long[bulkArgs.length];
             if (bulkArgs == null) {
                 session.bind(UNNAMED, UNNAMED, Collections.emptyList(), null);

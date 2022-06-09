@@ -283,4 +283,8 @@ public class AnalyzedStatementVisitor<C, R> {
     public R visitAlterSubscription(AnalyzedAlterSubscription alterSubscription, C context) {
         return visitDDLStatement(alterSubscription, context);
     }
+
+    public R visitDeclareCursor(AnalyzedDeclareCursor declareCursor, C context) {
+        return visitAnalyzedStatement(declareCursor, context);
+    }
 }

@@ -123,3 +123,7 @@ Fixes
 - Fixed an issue that caused queries operating on expressions with no defined
   type to fail. Examples are queries with ``GROUP BY`` on an ignored object
   column or ``UNION`` on ``NULL`` literals.
+
+- Fixed casts of ``TEXT`` to ``REGCLASS`` data types which were resulting in
+  wrong ``REGCLASS`` values as the  ``current_schema`` was not taken into
+  account.

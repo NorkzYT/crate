@@ -21,8 +21,9 @@
 
 package io.crate.sql.tree;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +32,10 @@ public class JoinUsingTests {
 
     @Test
     public void testToExpression() {
-        for (int n : new int[]{1, 7}) {
+        for (int n :List.of(1, 2, 3, 4, 5, 6, 7)) {
 
             List<String> cols = new ArrayList<>(n);
-            for (int i=0; i < n; i++) {
+            for (int i = 0; i < n; i++) {
                 cols.add("col_" + i);
             }
             QualifiedName left = QualifiedName.of("doc", "t1");
@@ -42,21 +43,19 @@ public class JoinUsingTests {
             Expression expr = JoinUsing.toExpression(left, right, cols);
             Expression e = expr;
             for (int i = 0; i < n - 2; i++) {
-                assertTrue(e instanceof LogicalBinaryExpression);
+                assertThat(e).isInstanceOf(LogicalBinaryExpression.class);
                 LogicalBinaryExpression and = (LogicalBinaryExpression) e;
-                assertTrue(and.getLeft() instanceof ComparisonExpression);
-                assertTrue(and.getRight() instanceof LogicalBinaryExpression);
+                assertThat(and.getLeft()).isInstanceOf(ComparisonExpression.class);
+                assertThat(and.getRight()).isInstanceOf(LogicalBinaryExpression.class);
                 e = and.getRight();
             }
-            if (n > 0) {
-                if (1 == n) {
-                    assertTrue(e instanceof ComparisonExpression);
-                } else {
-                    assertTrue(e instanceof LogicalBinaryExpression);
-                    LogicalBinaryExpression and = (LogicalBinaryExpression) e;
-                    assertTrue(and.getLeft() instanceof ComparisonExpression);
-                    assertTrue(and.getRight() instanceof ComparisonExpression);
-                }
+            if (1 == n) {
+                assertThat(e).isInstanceOf(ComparisonExpression.class);
+            } else {
+                assertThat(e).isInstanceOf(LogicalBinaryExpression.class);
+                LogicalBinaryExpression and = (LogicalBinaryExpression) e;
+                assertThat(and.getLeft()).isInstanceOf(ComparisonExpression.class);
+                assertThat(and.getRight()).isInstanceOf(ComparisonExpression.class);
             }
         }
     }

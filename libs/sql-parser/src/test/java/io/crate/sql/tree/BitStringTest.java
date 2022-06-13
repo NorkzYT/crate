@@ -22,9 +22,8 @@
 
 package io.crate.sql.tree;
 
-import static io.crate.sql.testing.Asserts.assertThrowsMatches;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.BitSet;
 
@@ -36,10 +35,7 @@ import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-
-import io.crate.sql.testing.Asserts;
 
 @RunWith(JUnitQuickcheck.class)
 public class BitStringTest {
@@ -67,35 +63,36 @@ public class BitStringTest {
         BitSet expected = new BitSet(8);
         expected.set(5, true);
         expected.set(6, true);
-        assertThat(bit.bitSet(), is(expected));
+        assertThat(bit.bitSet()).isEqualTo((expected));
     }
 
     @Test
     public void test_bit_string_cannot_contain_values_other_than_zeros_or_ones() {
-        assertThrowsMatches(
-            () -> BitString.ofRawBits("0021💀"),
-            IllegalArgumentException.class,
-            "Bit string must only contain `0` or `1` values. Encountered: 2");
+        assertThatThrownBy(
+            () -> BitString.ofRawBits("0021💀"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Bit string must only contain `0` or `1` values. Encountered: 2");
     }
 
     @Test
     public void test_can_render_bitstring_as_string() {
         String text = "00000110";
         BitString bit = BitString.ofRawBits(text);
-        assertThat(bit.asBitString(), is("B'00000110'"));
+        assertThat(bit.asBitString()).isEqualTo("B'00000110'");
     }
 
     @Test
     public void test_lexicographically_order() {
-        assertThat(BitString.ofRawBits("1001").compareTo(BitString.ofRawBits("1111")), is(-1));
-        assertThat(BitString.ofRawBits("1111").compareTo(BitString.ofRawBits("1001")), is(1));
-        assertThat(BitString.ofRawBits("111").compareTo(BitString.ofRawBits("0001")), is("111".compareTo("0001")));
+        assertThat(BitString.ofRawBits("1001").compareTo(BitString.ofRawBits("1111"))).isEqualTo(-1);
+        assertThat(BitString.ofRawBits("1111").compareTo(BitString.ofRawBits("1001"))).isEqualTo(1);
+        assertThat(BitString.ofRawBits("111").compareTo(BitString.ofRawBits("0001")))
+            .isEqualTo("111".compareTo("0001"));
     }
 
 
     @Property
     public void test_bitstring_compare_behaves_like_asBitString_compareTo(@From(BitStringGen.class) BitString a,
                                                                           @From(BitStringGen.class) BitString b) {
-        assertThat(a.compareTo(b), is(Integer.signum(a.asBitString().compareTo(b.asBitString()))));
+        assertThat(a.compareTo(b)).isEqualTo(Integer.signum(a.asBitString().compareTo(b.asBitString())));
     }
 }

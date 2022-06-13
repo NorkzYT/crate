@@ -944,12 +944,15 @@ public class TestStatementBuilder {
             " as tt order by iiy");
         printStatement("select extract(day from x) from y");
         printStatement("select * from foo order by 1, 2 limit all offset ?");
+        printStatement("select * from foo order by 1, 2 fetch first 10 rows only offset ?");
         printStatement("select * from foo order by 1, 2 limit null offset ?");
+        printStatement("select * from foo order by 1, 2 fetch next null row only offset ?");
         printStatement("select * from foo order by 1, 2 limit 1 offset ?");
         printStatement("select * from foo order by 1, 2 limit 1 offset ? row");
         printStatement("select * from foo order by 1, 2 limit 1 offset null row");
         printStatement("select * from foo order by 1, 2 limit all offset ? rows");
         printStatement("select * from foo order by 1, 2 limit all offset null rows");
+        printStatement("select * from foo order by 1, 2 fetch first 10 row only offset null rows");
         printStatement("select * from foo order by 1, 2 offset 10 rows limit all");
         printStatement("select * from foo order by 1, 2 offset 10 limit 5");
         printStatement("select * from foo a (x, y, z)");
@@ -1193,7 +1196,9 @@ public class TestStatementBuilder {
         // insert from query
         printStatement("insert into foo (id, name) select id, name from bar order by id");
         printStatement("insert into foo (id, name) select * from bar limit 3 offset 10");
+        printStatement("insert into foo (id, name) select * from bar fetch first 3 rows only offset 10");
         printStatement("insert into foo (id, name) select * from bar limit null offset 10");
+        printStatement("insert into foo (id, name) select * from bar fetch next null row only offset 10");
         printStatement("insert into foo (id, name) select * from bar limit all offset 10 row");
         printStatement("insert into foo (id, name) select * from bar limit 3 offset 10 rows");
         printStatement("insert into foo (wealth, name) select sum(money), name from bar group by name");
@@ -1202,7 +1207,9 @@ public class TestStatementBuilder {
         printStatement("insert into foo (id, name) (select id, name from bar order by id)");
         printStatement("insert into foo (id, name) (select * from bar limit all offset 10)");
         printStatement("insert into foo (id, name) (select * from bar limit 3 offset 10 row)");
+        printStatement("insert into foo (id, name) (select * from bar fetch first 3 row only offset 10 row)");
         printStatement("insert into foo (id, name) (select * from bar limit 3 offset 10 rows)");
+        printStatement("insert into foo (id, name) (select * from bar fetch next 3 rows only offset 10 rows)");
         printStatement("insert into foo (id, name) (select * from bar limit 3 offset null rows)");
         printStatement("insert into foo (wealth, name) (select sum(money), name from bar group by name)");
         printStatement("insert into foo (select sum(money), name from bar group by name)");
